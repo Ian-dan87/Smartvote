@@ -1,97 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SmartVote</title>
 <style>
-body{font-family:Arial;background:#f2f2f2;text-align:center;padding:20px}
-.box{background:white;max-width:450px;margin:auto;padding:25px;border-radius:15px}
-input,button{width:90%;padding:13px;margin:8px;border-radius:8px}
-button{background:#222;color:white;border:0;font-size:16px}
-#message{font-weight:bold;margin-top:15px}
-.results{text-align:left;margin-top:20px}
+body{text-align:center;font-family:Arial;padding:30px}
+input,button{padding:15px;margin:10px;width:85%}
+button{background:#222;color:white;border:0;border-radius:8px}
+#message{font-weight:bold}
 </style>
 </head>
 
 <body>
-<div class="box">
 
 <h1>🗳️ SmartVote</h1>
-<p>Electronic Election System</p>
 
 <input id="reg" placeholder="Enter Registration Number">
 
-<h3>Candidates</h3>
-
-<button onclick="vote('Ian Dancan')">Vote for Ian Dancan</button>
-<button onclick="vote('Brian Otieno')">Vote for Brian Otieno</button>
-<button onclick="vote('Kevin Ochieng')">Vote for Kevin Ochieng</button>
+<button onclick="vote()">VOTE</button>
 
 <p id="message"></p>
 
-<div class="results">
-<h3>📊 Results</h3>
-<p>Ian Dancan: <span id="ian">0</span></p>
-<p>Brian Otieno: <span id="brian">0</span></p>
-<p>Kevin Ochieng: <span id="kevin">0</span></p>
-</div>
-
-</div>
-
 <script>
-let voters = JSON.parse(localStorage.getItem("voters")) || {};
-let votes = JSON.parse(localStorage.getItem("votes")) || {
-"Ian Dancan":0,
-"Brian Otieno":0,
-"Kevin Ochieng":0
-};
-
-function vote(candidate){
-
-const reg = document.getElementById("reg").value.trim().toUpperCase();
-const message = document.getElementById("message");
-
-if(reg === ""){
-message.innerText = "Please enter your registration number.";
-return;
+function vote(){
+    document.getElementById("message").innerText =
+    "Vote submitted successfully!";
 }
-
-if(!/^CSC[0-9]{3,4}$/.test(reg)){
-message.innerText = "Invalid registration number. Use CSC001 to CSC1000.";
-return;
-}
-
-const number = Number(reg.substring(3));
-
-if(number < 1 || number > 1000){
-message.innerText = "Invalid registration number. Use CSC001 to CSC1000.";
-return;
-}
-
-if(voters[reg]){
-message.innerText = "This voter has already voted.";
-return;
-}
-
-voters[reg] = true;
-votes[candidate]++;
-
-localStorage.setItem("voters",JSON.stringify(voters));
-localStorage.setItem("votes",JSON.stringify(votes));
-
-message.innerText = "Vote submitted successfully!";
-document.getElementById("reg").value = "";
-
-showResults();
-}
-
-function showResults(){
-document.getElementById("ian").innerText = votes["Ian Dancan"];
-document.getElementById("brian").innerText = votes["Brian Otieno"];
-document.getElementById("kevin").innerText = votes["Kevin Ochieng"];
-}
-
-showResults();
 </script>
 
 </body>
