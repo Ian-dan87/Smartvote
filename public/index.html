@@ -8,9 +8,8 @@ body{font-family:Arial;background:#f2f2f2;text-align:center;padding:20px}
 .box{background:white;max-width:450px;margin:auto;padding:25px;border-radius:15px}
 input,button{width:90%;padding:13px;margin:8px;border-radius:8px}
 button{background:#222;color:white;border:0;font-size:16px}
-button:active{transform:scale(.98)}
-#message{font-weight:bold}
-.results{margin-top:20px;text-align:left}
+#message{font-weight:bold;margin-top:15px}
+.results{text-align:left;margin-top:20px}
 </style>
 </head>
 
@@ -40,42 +39,31 @@ button:active{transform:scale(.98)}
 </div>
 
 <script>
-
-const candidates = [
-"Ian Dancan",
-"Brian Otieno",
-"Kevin Ochieng"
-];
-
-let voters = JSON.parse(localStorage.getItem("smartvote_voters")) || {};
-
-let votes = JSON.parse(localStorage.getItem("smartvote_votes")) || {
+let voters = JSON.parse(localStorage.getItem("voters")) || {};
+let votes = JSON.parse(localStorage.getItem("votes")) || {
 "Ian Dancan":0,
 "Brian Otieno":0,
 "Kevin Ochieng":0
 };
 
-function validRegistration(reg){
-reg = reg.toUpperCase();
-
-if(!reg.startsWith("CSC")) return false;
-
-let number = Number(reg.substring(3));
-
-return number >= 1 && number <= 1000;
-}
-
 function vote(candidate){
 
-let reg = document.getElementById("reg").value.trim().toUpperCase();
-let message = document.getElementById("message");
+const reg = document.getElementById("reg").value.trim().toUpperCase();
+const message = document.getElementById("message");
 
-if(!reg){
+if(reg === ""){
 message.innerText = "Please enter your registration number.";
 return;
 }
 
-if(!validRegistration(reg)){
+if(!/^CSC[0-9]{3,4}$/.test(reg)){
+message.innerText = "Invalid registration number. Use CSC001 to CSC1000.";
+return;
+}
+
+const number = Number(reg.substring(3));
+
+if(number < 1 || number > 1000){
 message.innerText = "Invalid registration number. Use CSC001 to CSC1000.";
 return;
 }
@@ -88,25 +76,22 @@ return;
 voters[reg] = true;
 votes[candidate]++;
 
-localStorage.setItem("smartvote_voters",JSON.stringify(voters));
-localStorage.setItem("smartvote_votes",JSON.stringify(votes));
+localStorage.setItem("voters",JSON.stringify(voters));
+localStorage.setItem("votes",JSON.stringify(votes));
 
-message.innerText = "✅ Vote submitted successfully!";
+message.innerText = "Vote submitted successfully!";
 document.getElementById("reg").value = "";
 
 showResults();
 }
 
 function showResults(){
-
 document.getElementById("ian").innerText = votes["Ian Dancan"];
 document.getElementById("brian").innerText = votes["Brian Otieno"];
 document.getElementById("kevin").innerText = votes["Kevin Ochieng"];
-
 }
 
 showResults();
-
 </script>
 
 </body>
