@@ -100,4 +100,55 @@ window.vote = async function(){
 </script>
 
 </body>
-</html>
+<div id="countdown" style="font-size:20px;font-weight:bold;margin:20px 0;">
+  Loading election countdown...
+</div>
+
+<script type="module">
+import {
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+const countdown = document.getElementById("countdown");
+
+async function startCountdown() {
+  try {
+    const electionRef = doc(db, "elections", "config");
+    const electionSnap = await getDoc(electionRef);
+
+    if (!electionSnap.exists()) {
+      countdown.innerText = "Election time not configured.";
+      return;
+    }
+
+    const endTime = electionSnap.data().endTime.toMillis();
+
+    function updateCountdown() {
+      const remaining = endTime - Date.now();
+
+      if (remaining <= 0) {
+        countdown.innerText = "Election has ended.";
+        return;
+      }
+
+      const days = Math.floor(remaining / 86400000);
+      const hours = Math.floor((remaining % 86400000) / 3600000);
+      const minutes = Math.floor((remaining % 3600000) / 60000);
+      const seconds = Math.floor((remaining % 60000) / 1000);
+
+      countdown.innerText =
+        `Election ends in: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+  } catch (error) {
+    console.error(error);
+    countdown.innerText = "countdown.innerText = "Election countdown is loading...";Unable to load election countdown.";
+  }
+}
+
+startCountdown();
+</script></html>
