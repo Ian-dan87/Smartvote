@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SmartVote</title>
+<style>
+body{text-align:center;font-family:Arial;padding:25px}
+input,select,button{padding:15px;margin:10px;width:85%;box-sizing:border-box}
+button{background:#222;color:white;border:0;border-radius:8px}
+#message{font-weight:bold}
+</style>
+</head>
+
+<body>
+
+<h1>🗳️ SmartVote</h1>
+
+<input id="reg" placeholder="Enter Demo Voter ID">
+
+<select id="candidate">
+  <option value="">Select Candidate</option>
+  <option value="Ian Dancan">Ian Dancan</option>
+  <option value="Brian Otieno">Brian Otieno</option>
+  <option value="Kevin Ochieng">Kevin Ochieng</option>
+</select>
+
+<button onclick="vote()">VOTE</button>
+
+<p id="message"></p>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  serverTimestamp
+}
+from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBs8VNWmI8D9mseDa_h22x8Ulxh0AwnSQg",
+  authDomain: "smartvote-4b606.firebaseapp.com",
+  projectId: "smartvote-4b606",
+  storageBucket: "smartvote-4b606.firebasestorage.app",
+  messagingSenderId: "335961217747",
+  appId: "1:335961217747:web:0d9b778fcd0755bc239226"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.vote = async function(){
+
+  const voterId = document.getElementById("reg").value.trim();
+  const candidate = document.getElementById("candidate").value;
+  const message = document.getElementById("message");
+
+  if(!voterId || !candidate){
+    message.innerText = "Please enter your voter ID and select a candidate.";
+    return;
+  }
+
+  try{
+
+    const q = query(
+      collection(db,"votes"),
+      where("voterId","==",voterId)
+    );
+
+    const existing = await getDocs(q);
+
+    if(!existing.empty){
+      message.innerText = "This voter has already voted.";
+      return;
+    }
+
+    await addDoc(collection(db,"votes"),{
+      voterId: voterId,
+      candidate: candidate,
+      timestamp: serverTimestamp()
+    });
+
+    message.innerText = "Vote submitted successfully!";
+
+  }catch(error){
+
+    console.error(error);
+    message.innerText = "Error submitting vote.";
+
+  }
+
+};
+
+</script>
+
+</body>
+<div id="countdown" style="font-size:20px;font-weight:bold;margin:20px 0;">
+  Loading election countdown...
+</div>
+
+<script type="module">
+import {
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+const countdown = document.getElementById("countdown");
+
+async function startCountdown() {
+  try {
+    const electionRef = doc(db, "elections", "config");
+    const electionSnap = await getDoc(electionRef);
+
+    if (!electionSnap.exists()) {
+      countdown.innerText = "Election time not configured.";
+      return;
+    }
+
+    const endTime = electionSnap.data().endTime.toMillis();
+
+    function updateCountdown() {
+      const remaining = endTime - Date.now();
+
+      if (remaining <= 0) {
+        countdown.innerText = "Election has ended.";
+        return;
+      }
+
+      const days = Math.floor(remaining / 86400000);
+      const hours = Math.floor((remaining % 86400000) / 3600000);
+      const minutes = Math.floor((remaining % 3600000) / 60000);
+      const seconds = Math.floor((remaining % 60000) / 1000);
+
+      countdown.innerText =
+        `Election ends in: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+  } catch (error) {
+    console.error(error);
+    countdown.innerText = "countdown.innerText = "Election countdown is loading...";Unable to load election countdown.";
+  }
+}
+
+startCountdown();
+</script></html>
