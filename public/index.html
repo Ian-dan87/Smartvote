@@ -1,0 +1,85 @@
+<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartVote</title><style>
+body {
+  text-align: center;
+  font-family: Arial, sans-serif;
+  padding: 25px;
+}
+
+input, select, button {
+  padding: 15px;
+  margin: 10px;
+  width: 85%;
+  box-sizing: border-box;
+}
+
+button {
+  background: #222;
+  color: white;
+  border: 0;
+  border-radius: 8px;
+}
+
+#countdown {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 20px;
+}
+
+#message {
+  font-weight: bold;
+}
+</style></head><body><h1>🗳️ SmartVote</h1><h2>Election Countdown</h2>
+<p id="countdown">Loading...</p><input id="reg" placeholder="Enter Demo Voter ID"><select id="candidate">
+  <option value="">Select Candidate</option>
+  <option value="Ian Dancan">Ian Dancan</option>
+  <option value="Brian Otieno">Brian Otieno</option>
+  <option value="Kevin Ochieng">Kevin Ochieng</option>
+</select><button onclick="vote()">VOTE</button>
+
+<p id="message"></p><script>
+const electionDate = new Date("2026-09-20T10:00:00+03:00").getTime();
+
+function updateCountdown() {
+  const now = new Date().getTime();
+  const distance = electionDate - now;
+  const countdown = document.getElementById("countdown");
+
+  if (distance <= 0) {
+    countdown.innerHTML = "🟢 ELECTION IS OPEN";
+    return;
+  }
+
+  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+  countdown.innerHTML =
+    days + "d " +
+    hours + "h " +
+    minutes + "m " +
+    seconds + "s";
+}
+
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+function vote() {
+  const voter = document.getElementById("reg").value;
+  const candidate = document.getElementById("candidate").value;
+  const message = document.getElementById("message");
+
+  if (!voter || !candidate) {
+    message.innerHTML = "Please enter your Voter ID and select a candidate.";
+    return;
+  }
+
+  message.innerHTML = "Vote recorded for " + candidate + " (Demo).";
+}
+</script></body>
+</html>
+
