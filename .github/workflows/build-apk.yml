@@ -14,30 +14,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
-      - name: Install
+      - name: Install dependencies
         run: npm ci
 
-      - name: Java
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
 
-      - name: Android SDK
+      - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Capacitor
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses
+
+      - name: Capacitor sync
         run: npx cap sync android
 
-      - name: Build
-        run: cd android && chmod +x gradlew && ./gradlew assembleDebug
+      - name: Build APK
+        working-directory: android
+        run: chmod +x gradlew && ./gradlew assembleDebug
 
-      - name: APK
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: SmartVote-APK
